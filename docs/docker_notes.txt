@@ -1,0 +1,44 @@
+# Resources 
+https://markheath.net/post/exploring-postgresql-with-docker
+https://severalnines.com/database-blog/mysql-docker-containers-understanding-basics
+
+# Best practice pg compose 
+https://devops.stackexchange.com/questions/5735/best-practice-for-postgres-setup-with-docker-compose
+
+# compose 
+docker-compose up -d
+
+# Get the image
+docker pull postgres
+
+# Running the pg docker
+ocker run --rm   --name pg-docker -e POSTGRES_PASSWORD=docker -d -p 5432:5432 
+-v $HOME/docker/volumes/postgres:/var/lib/postgresql/data  postgres
+
+# Connecting to pg
+psql -h localhost -U postgres -d postgres
+
+# This auto creates the volume in docker
+docker run -d -p 5432:5432 -v postgres-data:/var/lib/postgresql/data `
+           --name postgres1 postgres
+
+# This checks the logs of the docker image Running
+docker logs postgres1
+
+# Sample compose 
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

@@ -1,0 +1,52 @@
+discord_user (
+    id (PK)                     # 265368254761926667         # ctx.message.author.id
+    discord_username            # SgtMajorDoobie#5280        # ctx.messagse.author
+    display_name                # SgtMajorDoobie             # ctx.message.author.display_name
+    joined_zulu_discord         # 2018-08-05 19:01:03.285000 # ctx.message.author.joined_at
+    discord_account_created_at  # 2017-01-02 06:38:42.239000 # ctx.message.author.created_at 
+    joined_zulu_clash   
+    active_member               # (boolean) true # If member is registered 
+)
+
+)
+clash_account (
+    coc_tag (PK)       # player.tag
+    discord_id (FK)    # ctx.message.author.id
+    coc_name           # player.name
+    coc_share_link     # player.share_link
+    coc_clan_name       # player.clan.name
+    coc_clan_tag        # player.clan.tag
+    coc_clan_share_link # player.clan.share_link
+    coc_badge_url       # player.league.badge.small
+    coc_badge_name      # player.league.name
+    coc_townhall_level  # player.town_hall
+
+)
+update_rotation (
+    
+    current_trophy          
+    alltime_best_trophy
+    war_star_won
+    attacks_won
+    defenses_won
+    gold_grab
+    elixir_escapade
+    heroic_heist
+    treasurer               # CC gold collected
+    games_champion          # Clan game points
+    war_league_legend
+    well_seasoned
+    friend_in_need
+    current_clan_tag         # See history of where they have been
+    current_clan_name        # See history of where they have been
+)
+
+
+# Legend Tool
+await coc_client.get_seasons(player.league.id)
+await coc_client.get_season_rankings(player.league.id, '2019-09') 
+
+
+for i,e in enumerate(k): 
+...:     if e.tag == player.tag: 
+...:         print(player.name,'ranking is',i) 

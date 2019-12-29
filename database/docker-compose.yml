@@ -1,0 +1,21 @@
+version: '3.3'
+services:
+  pg:
+    image: postgres:12.1-alpine
+    container_name: "frosch_pg"
+    networks:
+      - net
+    ports:
+      - 5432:5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data/pg_data
+    environment:
+      POSTGRES_USER: pgadmin4life
+      POSTGRES_PASSWORD: ${PASSWORD}
+      POSTGRES_DB: pantherdb
+      POSTGRES_PORT: 5432 
+      PGDATA: /var/lib/postgresql/data/pg_data
+networks:
+  net:
+volumes:
+  pg_data:
