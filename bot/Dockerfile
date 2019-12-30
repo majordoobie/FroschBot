@@ -7,6 +7,8 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-CMD [ "python", "./test.py" ]
+# For dev only
+ENTRYPOINT ["tail", "-f", "/dev/null"]
+#CMD [ "python" ]
 # CMD [ "python", "./your-daemon-or-script.py" ]
 
