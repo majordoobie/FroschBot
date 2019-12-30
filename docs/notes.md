@@ -18,3 +18,8 @@ player = loop.run_until_complete(client.get_player(tag))
 ```python
 print(f"ACC_{i.lower().replace(' ','_').replace('!','').replace('-','').replace('.','').replace('&','and')} INTEGER DEFAULT 0,")
 ```
+
+### Pushing .sql file to target docker
+```python
+docker exec -it <container-name> psql -U <DB_USER> -d <DB_NAME> -f /file.sql
+```
