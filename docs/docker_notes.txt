@@ -5,6 +5,10 @@ https://severalnines.com/database-blog/mysql-docker-containers-understanding-bas
 # Best practice pg compose 
 https://devops.stackexchange.com/questions/5735/best-practice-for-postgres-setup-with-docker-compose
 
+# Rebuilding frosch
+WARNING: Image for service frosch_bot was built because it did not already exist.
+To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+
 # compose 
 docker-compose up -d
 

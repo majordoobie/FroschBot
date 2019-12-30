@@ -1,7 +1,12 @@
 # Frosh build
 FROM python:3.8.0-buster
+
 WORKDIR /usr/src/app
+
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
-COPY .. .
+
+COPY . .
+CMD [ "python", "./test.py" ]
+# CMD [ "python", "./your-daemon-or-script.py" ]
 

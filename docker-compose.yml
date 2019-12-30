@@ -1,9 +1,9 @@
 version: '3.7'
 services:
   frosch_postgres:
+    container_name: frosch_postgres
     image: postgres:12.1-alpine
     restart: always
-    container_name: "froschDB"
     networks:
       - zulu_network
     environment:
@@ -11,18 +11,35 @@ services:
       POSTGRES_PASSWORD: ${PASSWORD}
       POSTGRES_DB: pantherdb
       POSTGRES_PORT: 5432
-      PGDATA: /var/lib/postgresql/data/pg_data
-    volume:
+      PGDATA: /var/lib/postgresql/data
+    volumes:
       - frosh_db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
 
   frosch_bot:
-    build: ./bot
-    dockerfile: Dockerfile
+    container_name: frosch_bot
+    restart: always
+    depends_on:
+      - frosch_postgres
+    # Specifying a different directory for the dockerfile
+    # Specifying Dockerfile is redundant since that is default
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    # Volume that Dockerfile is creating
+    volumes:
+      - ./bot:/usr/src/app
     networks:
       - zulu_network
 
+
+volumes:
+  frosh_db:
+
 networks:
   zulu_network:
+    name: zulu_network
     driver: bridge
 
 
