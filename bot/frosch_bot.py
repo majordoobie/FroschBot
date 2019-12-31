@@ -9,6 +9,7 @@ from discord.ext import commands
 
 COG_PATH = 'cogs.'
 COG_TUPLE = (
+    'cogs.administrator',
 )
 EMBED_COLORS = {
     'blue': 0x000080

@@ -1,9 +1,10 @@
 # Built-ins
 from argparse import ArgumentParser
 import asyncio
-from json import load
+import asyncpg
 import logging
 import logging.handlers
+import traceback
 from pathlib import Path
 
 # local
@@ -55,8 +56,18 @@ MSG: %(message)s
 
 def main(bot_mode):
     setup_logging()
-    bot = FroschBot(bot_config=keys.bot_config(bot_mode), keys=keys, bot_mode=bot_mode)
-    bot.run()
+    loop = asyncio.get_event_loop()
+
+    try:
+        # TODO: Error with establishing a connection to the database
+        # configure the database connection
+        pool = loop.run_until_complete(asyncpg.create_pool(keys.postgres, command_timeout=60))
+        bot = FroschBot(bot_config=keys.bot_config(bot_mode), keys=keys, bot_mode=bot_mode)
+        bot.pool = pool
+        bot.run()
+
+    except Exception:
+        traceback.print_exc()
 
 
 if __name__ == '__main__':
