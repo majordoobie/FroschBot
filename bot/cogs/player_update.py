@@ -29,17 +29,9 @@ class PlayerUpdate(commands.Cog):
                 'required': True
             }
         }
-        try:
-            parsed_args = await arg_parser(flag_template, args)
-        except Exception as e:
-            print(dir(e.args))
-            print('string',type(str(e)))
-            print('traceback',e.with_traceback())
-            await self.bot.embed_print(ctx, title='Command Line Error', color='red',
-                                       description=str(e))
-            print("did it work?")
 
-        print(parsed_args)
+        parsed_args = await arg_parser(flag_template, args)
+        await ctx.send(parsed_args)
         discord_id = ctx.author.id
         print(discord_id)
         print('here')

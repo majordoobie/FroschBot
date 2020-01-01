@@ -27,20 +27,24 @@ class Administrator(commands.Cog):
         cog = f'{self.bot.cog_path}{cog}'
         try:
             self.bot.load_extension(cog)
-        except Exception as e:
-            await ctx.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
+        except:
+            await self.bot.embed_print(ctx, title='COG LOAD ERROR', color='red',
+                                       description=f'`{cog}` not found')
             return
-        await ctx.send(f'Loaded {cog} successfully')
+        await self.bot.embed_print(ctx, title='COG COMMAND', color='green',
+                                   description=f'Loaded `{cog}` successfully')
 
     @commands.command(aliases=['unload'])
     async def unload_cog(self, ctx, cog: str):
         cog = f'{self.bot.cog_path}{cog}'
         try:
             self.bot.unload_extension(cog)
-        except Exception as e:
-            await ctx.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
+        except:
+            await self.bot.embed_print(ctx, title='COG LOAD ERROR', color='red',
+                                       description=f'`{cog}` not found')
             return
-        await ctx.send(f'Unloaded {cog} successfully')
+        await self.bot.embed_print(ctx, title='COG COMMAND', color='green',
+                                   description=f'Unloaded `{cog}` successfully')
 
     @commands.command(aliases=['re'])
     async def re_load(self, ctx, cog: str):
@@ -49,10 +53,12 @@ class Administrator(commands.Cog):
         try:
             self.bot.unload_extension(cog)
             self.bot.load_extension(cog)
-        except Exception as e:
-            await ctx.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
+        except:
+            await self.bot.embed_print(ctx, title='COG LOAD ERROR', color='red',
+                                       description=f'`{cog}` not found')
             return
-        await ctx.send(f'Reloaded {cog} successfully')
+        await self.bot.embed_print(ctx, title='COG COMMAND', color='green',
+                                   description=f'Reloaded `{cog}` successfully')
 
     @commands.command()
     async def re_run(self, ctx, *, args):
@@ -75,28 +81,21 @@ class Administrator(commands.Cog):
         # Get the commands to run
         reload_cog = self.bot.get_command('re_load')
         run_command = self.bot.get_command(parsed_command[1])
+        if run_command is None:
+            await self.bot.embed_print(ctx, title='COMMAND ERROR', color='red',
+                                       description=f'Command `{parsed_command[1]}` not found')
+            return
 
+        # Run commands
         await ctx.invoke(reload_cog, parsed_command[0])
-        try:
-            await ctx.invoke(run_command)
-        except Exception as e:
-            print(e)
-
-        # player_update dev.add one two three
-
-        # print(args)
-        # # ('player_update', 'dev.add', 'one', 'two', 'three')
-        # reload_cmd = self.bot.get_command('re_load')
-        # rerun_cmd = self.bot.get_command('add')
-        # await ctx.invoke(reload_cmd, 'player_update')
-        # await ctx.invoke(rerun_cmd)
+        await ctx.invoke(run_command, parsed_command[-1])
 
     @commands.command()
     async def list_cogs(self, ctx):
         output = ''
         for i in self.bot.cog_tupe:
-            output += i.split('.')[-1] + '\n'
-        await ctx.send(output)
+            output += f"`{i.split('.')[-1]}`\n"
+        await self.bot.embed_print(ctx, title='COG LIST', description=output)
 
 
 def setup(bot):

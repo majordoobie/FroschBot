@@ -46,7 +46,6 @@ async def arg_parser(arg_dict, arg_string):
     """
     # Empty return payload
     parsed_args = {}
-
     # Create required arguments dictionary and used directory
     required_flags = {}
     used_flags = {}
@@ -64,13 +63,15 @@ async def arg_parser(arg_dict, arg_string):
     # If arg_string is empty but required arguments are expected
     elif arg_string is None:
         missing_flags = await get_missing_flags(required_flags, arg_dict)
-        raise RuntimeError('Arg Parser Error: Required argument was not used', missing_flags)
+        raise RuntimeError(get_req_arguments_not_used(missing_flags))
+
 
     # create parsed_args
     arg_list = arg_string.split()
 
     for flag, dictionary in arg_dict.items():
         for arg in arg_list:
+            print(arg)
             if arg in dictionary['flags']:  # If a command argument is found
                 # If flag is required, set it to "used/True"
                 if flag in required_flags:
@@ -93,18 +94,18 @@ async def arg_parser(arg_dict, arg_string):
                         argument = arg_list.pop(arg_index + 1)
                         if argument in all_flags(arg_dict):
                             flag_error = arg_list[arg_index]
-                            raise RuntimeError(f"Arg Parser Error: [{flag_error}] positioned behind a registered "
-                                               f"flag [{argument}]")
+                            raise RuntimeError(f"\n`{flag_error}` positioned behind a registered "
+                                               f"flag `{argument}`")
                         arg_list.pop(arg_index)
                         parsed_args[flag] = argument
                     else:
                         flag_error = dictionary['flags'][dict_index]
-                        raise RuntimeError(f"Arg Parser Error: Argument expected after {flag_error} flag")
+                        raise RuntimeError(f"\nArgument expected after `{flag_error}` flag")
 
     # Make sure not arguments were left behind
     missing_flags = await get_missing_flags(required_flags, arg_dict)
     if missing_flags:
-        raise RuntimeError('Arg Parser Error: Required argument was not used', missing_flags)
+        raise RuntimeError(get_req_arguments_not_used(missing_flags))
 
     # Set unused arguments to default
     for flag, used in used_flags.items():
@@ -155,3 +156,9 @@ def all_flags(arg_dict):
         for i in v['flags']:
             _all_flags.append(i)
     return _all_flags
+
+
+def get_req_arguments_not_used(missing_flags):
+    return ('\nRequired argument(s) were not used \n\n '
+            f'-> `{missing_flags}`')
+
