@@ -1,13 +1,24 @@
+import asyncio
 from discord.ext import commands
+import logging
 from discord import Forbidden, NotFound, HTTPException
 
 
 class Administrator(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.log = logging.getLogger('root.cogs.administrator')
 
     @commands.command(aliases=['kill'])
     async def _logout(self, ctx):
+        self.log.info("Initiating logout phase")
+
+        try:
+            await asyncio.wait_for(self.bot.pool.close(), timeout=5.0)
+        except asyncio.TimeoutError:
+            self.log.error("Force send terminate() on connection pool")
+
+        self.log.info("Connection pool closed")
         await self.bot.logout()
 
     @commands.command(aliases=['load'])

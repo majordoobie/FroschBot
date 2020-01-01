@@ -12,9 +12,7 @@ import keys
 from frosch_bot import FroschBot
 
 # Global Variables
-# TODO: Change this to a python file instead
-FROSCH_LOG = Path('frosch.log')
-FROSCH_CONFIG = Path('frosch_config.json')
+FROSCH_LOG = Path('logs/frosch.log')
 DESCRIPTION = "Bot used to maintain a Clash of Clans database and provide logging"
 
 
@@ -46,9 +44,7 @@ def setup_logging():
 [%(asctime)s]:[%(levelname)s]:[%(name)s]:[Line:%(lineno)d][Func:%(funcName)s]
 [Path:%(pathname)s]
 MSG: %(message)s
-''',
-                                  "%d %b %H:%M:%S"
-                                  )
+''', "%d %b %H:%M:%S")
     log_handler.setFormatter(formatter)
     log.addHandler(log_handler)
     log.info('Logger initialized')
@@ -59,8 +55,6 @@ def main(bot_mode):
     loop = asyncio.get_event_loop()
 
     try:
-        # TODO: Error with establishing a connection to the database
-        # configure the database connection
         pool = loop.run_until_complete(asyncpg.create_pool(keys.postgres, command_timeout=60))
         bot = FroschBot(bot_config=keys.bot_config(bot_mode), keys=keys, bot_mode=bot_mode)
         bot.pool = pool

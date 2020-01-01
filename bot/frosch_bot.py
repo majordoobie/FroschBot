@@ -62,7 +62,10 @@ class FroschBot(commands.Bot):
                 print('BROOO')
 
     async def on_error(self, ctx, error):
-        await ctx.send("```py\n{}: {}\n```".format(type(error).__name__, str(error)))
+        try:
+            await ctx.send("```py\n{}: {}\n```".format(type(error).__name__, str(error)))
+        except AttributeError as e:
+            self.log.error(f"{e}\nMost likely closing down")
 
     async def embed_print(self, ctx, title=None, description=None, color='blue'):
         '''
