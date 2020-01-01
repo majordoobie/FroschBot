@@ -1,6 +1,7 @@
 import asyncio
 from discord.ext import commands
 import logging
+import traceback
 from discord import Forbidden, NotFound, HTTPException
 
 

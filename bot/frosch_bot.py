@@ -1,7 +1,9 @@
 # Built-in
 import asyncio
+import datetime
 import logging
 import traceback
+import sys
 
 # Non-built ins
 from discord import Embed
@@ -10,6 +12,7 @@ from discord.ext import commands
 COG_PATH = 'cogs.'
 COG_TUPLE = (
     'cogs.administrator',
+    'cogs.player_update'
 )
 EMBED_COLORS = {
     'blue': 0x000080
@@ -19,10 +22,11 @@ EMBED_COLORS = {
 class FroschBot(commands.Bot):
     __slots__ = ('bot_config', 'keys', 'bot_mode', 'log')
 
-    def __init__(self, bot_config, keys, bot_mode):
+    def __init__(self, bot_config, keys, bot_mode, coc):
         self.bot_config = bot_config
         self.keys = keys
         self.bot_mode = bot_mode
+        self.coc = coc
         self.cog_tupe = COG_TUPLE
         self.cog_path = COG_PATH
         super().__init__(command_prefix=self.bot_config['bot_prefix'])
@@ -33,9 +37,10 @@ class FroschBot(commands.Bot):
         for extension in COG_TUPLE:
             try:
                 self.load_extension(extension)
-            except Exception:
-                print(f'Failed to load extension {extension}')
-                self.log.error(traceback.print_exc())
+            except Exception as e:
+                out = f'Failed to load extension {extension}\n{e}'
+                print(out)
+                self.log.error(out)
 
         print('Cogs loaded - establishing connection...')
         super().run(self.bot_config['bot_token'], reconnect=True)
@@ -113,4 +118,6 @@ class FroschBot(commands.Bot):
         if block:
             blocks.append(block)
         return blocks
+
+
 

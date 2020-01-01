@@ -2,6 +2,9 @@
 from argparse import ArgumentParser
 import asyncio
 import asyncpg
+import coc
+import datetime
+from discord import Embed
 import logging
 import logging.handlers
 import traceback
@@ -29,7 +32,6 @@ class BotArgs(ArgumentParser):
     def parse_the_args(self):
         return self.parse_args()
 
-
 def setup_logging():
     log = logging.getLogger('root')
     log.setLevel(logging.DEBUG)
@@ -50,13 +52,14 @@ MSG: %(message)s
     log.info('Logger initialized')
 
 
-def main(bot_mode):
+def main(bot_mode, coc):
     setup_logging()
     loop = asyncio.get_event_loop()
 
     try:
         pool = loop.run_until_complete(asyncpg.create_pool(keys.postgres, command_timeout=60))
-        bot = FroschBot(bot_config=keys.bot_config(bot_mode), keys=keys, bot_mode=bot_mode)
+        bot = FroschBot(bot_config=keys.bot_config(bot_mode), keys=keys,
+                        bot_mode=bot_mode, coc=coc)
         bot.pool = pool
         bot.run()
 
@@ -65,8 +68,10 @@ def main(bot_mode):
 
 
 if __name__ == '__main__':
+    coc_client = coc.login(keys.coc_api['email'], keys.coc_api['password'],
+                           throttle_limit=30, key_count=3)
     args = BotArgs().parse_the_args()
     if args.live_mode:
-        main('live_mode')
+        main('live_mode', coc_client)
     else:
-        main('dev_mode')
+        main('dev_mode', coc_client)
