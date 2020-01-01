@@ -55,11 +55,49 @@ class Administrator(commands.Cog):
         await ctx.send(f'Reloaded {cog} successfully')
 
     @commands.command()
+    async def re_run(self, ctx, *, args):
+        """
+        Command method used to reload a cog and run a command afterwards. This simply calls
+        two command methods so that you do not have to type the commands twice in Discord.
+
+        Usage: {prefix} {cog to reload} {command to run} {args}
+
+        Parameters
+        ----------
+        ctx : discord.ext.commands.Context
+            Represents the context in which a command is being invoked under.
+        args : str
+            String containing the cog to reload and command to run
+        """
+        # Parse the arguments
+        parsed_command = args.split(' ', 2)
+
+        # Get the commands to run
+        reload_cog = self.bot.get_command('re_load')
+        run_command = self.bot.get_command(parsed_command[1])
+
+        await ctx.invoke(reload_cog, parsed_command[0])
+        try:
+            await ctx.invoke(run_command)
+        except Exception as e:
+            print(e)
+
+        # player_update dev.add one two three
+
+        # print(args)
+        # # ('player_update', 'dev.add', 'one', 'two', 'three')
+        # reload_cmd = self.bot.get_command('re_load')
+        # rerun_cmd = self.bot.get_command('add')
+        # await ctx.invoke(reload_cmd, 'player_update')
+        # await ctx.invoke(rerun_cmd)
+
+    @commands.command()
     async def list_cogs(self, ctx):
         output = ''
         for i in self.bot.cog_tupe:
             output += i.split('.')[-1] + '\n'
         await ctx.send(output)
+
 
 def setup(bot):
     bot.add_cog(Administrator(bot))

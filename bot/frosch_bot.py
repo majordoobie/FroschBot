@@ -15,7 +15,8 @@ COG_TUPLE = (
     'cogs.player_update'
 )
 EMBED_COLORS = {
-    'blue': 0x000080
+    'blue': 0x000080,
+    'red': 0x000080
 }
 
 
@@ -58,6 +59,9 @@ class FroschBot(commands.Bot):
         await ctx.message.channel.trigger_typing()
 
     async def on_command_error(self, ctx, error):
+        print('on_command_error invoked')
+
+
         if isinstance(error, commands.CommandInvokeError):
             original = error.original
             if isinstance(original, commands.errors.ExtensionNotFound):
@@ -67,22 +71,37 @@ class FroschBot(commands.Bot):
                 print('BROOO')
 
     async def on_error(self, ctx, error):
+        print("on_error invoked")
         try:
             await ctx.send("```py\n{}: {}\n```".format(type(error).__name__, str(error)))
         except AttributeError as e:
             self.log.error(f"{e}\nMost likely closing down")
 
     async def embed_print(self, ctx, title=None, description=None, color='blue'):
-        '''
-        Method is used to standarize how text is displayed to discord
-        '''
+        """
+        Method used to standardized how stuff is printed to the users
+        Parameters
+        ----------
+        ctx
+        title
+        description
+        color
+
+        Returns
+        -------
+
+        """
+        print("inside method")
+        print("another print")
+        print(type(description))
         if len(description) < 1000:
             embed = Embed(
                 title=title,
                 description=description,
                 color=EMBED_COLORS[color]
             )
-            embed.set_footer(text=self.config['version'])
+            embed.set_footer(text=self.keys['version'])
+            print('printing')
             await ctx.send(embed=embed)
         else:
             blocks = await self.text_splitter(description)
@@ -97,7 +116,7 @@ class FroschBot(commands.Bot):
                     description=i,
                     color=EMBED_COLORS[color]
                 ))
-            embeds[-1].set_footer(text=self.config['version'])
+            embeds[-1].set_footer(text=self.bot_config['version'])
             for i in embeds:
                 await ctx.send(embed=i)
 
