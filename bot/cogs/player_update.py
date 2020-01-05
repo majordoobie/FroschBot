@@ -5,7 +5,7 @@ from .utils.discord_arg_parser import arg_parser
 
 # Local
 from .utils.discord_arg_parser import arg_parser
-from .utils.discord_utils import get_discord_member
+from .utils import discord_utils as utils
 
 class PlayerUpdate(commands.Cog):
     def __init__(self, bot):
@@ -13,10 +13,12 @@ class PlayerUpdate(commands.Cog):
         self.log = logging.getLogger('root.cogs.player_update')
         #self.update.start()
 
+    @commands.check(utils.is_admin)
     @commands.command()
     async def _bot_status(self, ctx):
         await ctx.send('Database status: ')
 
+    @commands.check(utils.is_admin)
     @commands.command(aliases=['add'])
     async def add_user(self, ctx, *, args=None):
         flag_template = {
@@ -34,7 +36,13 @@ class PlayerUpdate(commands.Cog):
         # Get parserd args
         parsed_args = await arg_parser(flag_template, args)
 
-        result = await get_discord_member(ctx, parsed_args['guild_member'])
+        # Attempt to find user
+        result = await self.bot.utils.get_discord_member(ctx, parsed_args['guild_member'])
+        if result is None:
+            await self.bot.embed_print(ctx, title='COMMAND ERROR', color='red',
+                                 description=f"User `{parsed_args['guild_member']}` not found")
+        else:
+            await ctx.send(result)
         #print(result)
 
         return

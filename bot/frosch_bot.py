@@ -8,7 +8,7 @@ import sys
 # Non-built ins
 from discord import Embed, Status, Game
 from discord.ext import commands
-
+from cogs.utils import discord_utils
 COG_PATH = 'cogs.'
 COG_TUPLE = (
     'cogs.administrator',
@@ -31,7 +31,9 @@ class FroschBot(commands.Bot):
         self.coc = coc
         self.cog_tupe = COG_TUPLE
         self.cog_path = COG_PATH
+        self.utils = discord_utils
         super().__init__(command_prefix=self.bot_config['bot_prefix'])
+        self.owner_id = 265368254761926667
         self.log = logging.getLogger('root.FroschBot')
 
     def run(self):
@@ -61,6 +63,20 @@ class FroschBot(commands.Bot):
         await ctx.message.channel.trigger_typing()
 
     async def on_command_error(self, ctx, error):
+        # Catch command.Check errors
+        if isinstance(error, commands.CheckFailure):
+            try:
+                if error.args[0] == 'Not owner':
+                    await self.embed_print(ctx, title='COMMAND FORBIDDEN', color='red',
+                                           description='Only Doobie can run this command')
+                    return
+            except:
+                pass
+            await self.embed_print(ctx, title='COMMAND FORBIDDEN', color='red',
+                                   description='Only `CoC Leadership` are permitted to use this command')
+            return
+
+        # Catch all
         await self.embed_print(ctx, title='COMMAND ERROR',
                                description=str(error), color='red')
 

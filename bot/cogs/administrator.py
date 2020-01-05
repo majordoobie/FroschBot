@@ -4,12 +4,15 @@ import logging
 import traceback
 from discord import Forbidden, NotFound, HTTPException
 
+from utils import discord_utils as utils
+
 
 class Administrator(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.log = logging.getLogger('root.cogs.administrator')
 
+    @commands.check(utils.is_owner)
     @commands.command(aliases=['kill'])
     async def _logout(self, ctx):
         self.log.info("Initiating logout phase")
@@ -22,6 +25,7 @@ class Administrator(commands.Cog):
         self.log.info("Connection pool closed")
         await self.bot.logout()
 
+    @commands.check(utils.is_owner)
     @commands.command(aliases=['load'])
     async def load_cog(self, ctx, cog: str):
         cog = f'{self.bot.cog_path}{cog}'
@@ -34,6 +38,7 @@ class Administrator(commands.Cog):
         await self.bot.embed_print(ctx, title='COG COMMAND', color='green',
                                    description=f'Loaded `{cog}` successfully')
 
+    @commands.check(utils.is_owner)
     @commands.command(aliases=['unload'])
     async def unload_cog(self, ctx, cog: str):
         cog = f'{self.bot.cog_path}{cog}'
@@ -46,6 +51,7 @@ class Administrator(commands.Cog):
         await self.bot.embed_print(ctx, title='COG COMMAND', color='green',
                                    description=f'Unloaded `{cog}` successfully')
 
+    @commands.check(utils.is_owner)
     @commands.command(aliases=['re'])
     async def re_load(self, ctx, cog: str):
         cog = f'{self.bot.cog_path}{cog}'
@@ -60,6 +66,7 @@ class Administrator(commands.Cog):
         await self.bot.embed_print(ctx, title='COG COMMAND', color='green',
                                    description=f'Reloaded `{cog}` successfully')
 
+    @commands.check(utils.is_owner)
     @commands.command()
     async def re_run(self, ctx, *, args):
         """
@@ -90,6 +97,7 @@ class Administrator(commands.Cog):
         await ctx.invoke(reload_cog, parsed_command[0])
         await ctx.invoke(run_command, parsed_command[-1])
 
+    @commands.check(utils.is_owner)
     @commands.command()
     async def list_cogs(self, ctx):
         output = ''
