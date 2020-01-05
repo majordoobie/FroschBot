@@ -46,9 +46,12 @@ async def arg_parser(arg_dict, arg_string):
     """
     # Empty return payload
     parsed_args = {}
+
     # Create required arguments dictionary and used directory
     required_flags = {}
     used_flags = {}
+
+    # Set required dict
     for flag, dictionary in arg_dict.items():
         if dictionary['required']:
             required_flags[flag] = False
@@ -69,9 +72,9 @@ async def arg_parser(arg_dict, arg_string):
     # create parsed_args
     arg_list = arg_string.split()
 
+    # Main parser
     for flag, dictionary in arg_dict.items():
         for arg in arg_list:
-            print(arg)
             if arg in dictionary['flags']:  # If a command argument is found
                 # If flag is required, set it to "used/True"
                 if flag in required_flags:

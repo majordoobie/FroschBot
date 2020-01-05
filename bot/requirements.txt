@@ -4,7 +4,6 @@ asyncio==3.4.3
 asyncpg==0.20.0
 attrs==19.3.0
 chardet==3.0.4
-coc.py==0.3.2
 discord.py==1.2.5
 idna==2.8
 multidict==4.7.1

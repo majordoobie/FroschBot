@@ -6,7 +6,7 @@ import traceback
 import sys
 
 # Non-built ins
-from discord import Embed
+from discord import Embed, Status, Game
 from discord.ext import commands
 
 COG_PATH = 'cogs.'
@@ -54,6 +54,7 @@ class FroschBot(commands.Bot):
     async def on_ready(self):
         print("connected")
         self.log.info('Bot successfully logged on')
+        await self.change_presence(status=Status.online, activity=Game(name=self.bot_config['version']))
 
     # Commands
     async def on_command(self, ctx):
