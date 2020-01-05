@@ -1,7 +1,6 @@
 from discord.ext.commands import MemberConverter, UserConverter, NotOwner
 import discord
 
-
 async def get_discord_member(ctx, string):
     """
     Function used to get a member string if possible, if not a user string is returned. Otherwise it returns none.
@@ -101,11 +100,13 @@ def is_owner(ctx):
         raise NotOwner("Not owner")
 
 
-async def update_user(guild_member, update_dict):
+async def update_user(ctx, guild_member, update_dict):
     """
     Coro to update a users attributes from nickname to roles
     Parameters
     ----------
+    ctx : discord.ext.commands.Context
+        Represents the context in which a command is being invoked under.
     guild_member : discord.member.Member
         Discord guild user object
     update_dict : dict
@@ -118,7 +119,7 @@ async def update_user(guild_member, update_dict):
 
     """
     await guild_member.edit(nick=update_dict['nick'],
-                            roles=role_list(guild_member, update_dict['roles']))
+                            roles=role_list(ctx, guild_member, update_dict['roles']))
 
 
 async def new_user_roles(ctx, player):
@@ -136,18 +137,55 @@ async def new_user_roles(ctx, player):
     List of default roles
 
     """
-    if player.town_hall not in ctx.bot.keys.static_roles:
+    # Check if the town hall is supported
+    if player.town_hall not in ctx.bot.keys.static_th_roles:
         raise discord.InvalidData(f'Role `{player.town_hall}` does not exist. Create the role first.')
+    # Get guild object
     zulu_server = ctx.bot.get_guild(ctx.bot.keys.zulu_server)
-    town_hall_role_id = ctx.bot.keys.static_roles[player.town_hall]
+
+    # Get default user roles
+    town_hall_role_id = ctx.bot.keys.static_th_roles[player.town_hall]
     town_hall_role = zulu_server.get_role(town_hall_role_id)
-    member_role = zulu_server.get_role(ctx.bot.keys.static_roles['coc_member'])
+    member_role = zulu_server.get_role(ctx.bot.keys.coc_member_role)
+
     return [town_hall_role, member_role]
 
 
-def role_list(guild_member, new_roles):
+def role_list(ctx, guild_member, new_roles):
+    """
+    Simple function to extend the roles of a user
+    Parameters
+    ----------
+    ctx : discord.ext.commands.Context
+        Represents the context in which a command is being invoked under.
+    guild_member : discord.member.Member
+        Discord guild user object
+    new_roles : list
+        List of discord roles to apply to the user
+
+    Returns
+    -------
+    Complete list of roles to add to the user
+
+    """
+    # Users current roles
     member_roles = guild_member.roles
-    return member_roles.extend(new_roles)
+    # Static town hall roles
+    static_roles = ctx.bot.keys.static_th_roles.values()
+    # all of users town hall roles - ideally just one role
+    town_hall_roles = [role for role in member_roles if role.id in static_roles]
+
+    # Remove town hall roles if new one is present
+    for role in new_roles:
+        if role.id in static_roles:
+            if town_hall_roles:
+                for r in town_hall_roles:
+                    member_roles.pop(member_roles.index(r))
+            member_roles.append(role)
+        else:
+            member_roles.append(role)
+
+    return list(set(member_roles))  # Remove potential duplicates
 
 
 

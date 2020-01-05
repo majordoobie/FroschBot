@@ -25,9 +25,10 @@ EMBED_COLORS = {
 class FroschBot(commands.Bot):
     __slots__ = ('bot_config', 'keys', 'bot_mode', 'log')
 
-    def __init__(self, bot_config, keys, bot_mode, coc):
+    def __init__(self, bot_config, keys, bot_mode, coc, pool):
         self.bot_config = bot_config
         self.keys = keys
+        self.pool = pool
         self.bot_mode = bot_mode
         self.coc = coc
         self.cog_tupe = COG_TUPLE

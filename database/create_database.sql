@@ -8,7 +8,7 @@ DROP TABLE clash_update CASCADE;
 DROP TABLE user_note CASCADE;
 
 CREATE TABLE IF NOT EXISTS discord_user (
-    discord_id INTEGER PRIMARY KEY,
+    discord_id BIGINT PRIMARY KEY,
     discord_name TEXT NOT NULL,
     discord_nickname TEXT NOT NULL,
     discord_discriminator TEXT NOT NULL,

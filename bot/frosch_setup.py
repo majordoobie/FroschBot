@@ -32,6 +32,7 @@ class BotArgs(ArgumentParser):
     def parse_the_args(self):
         return self.parse_args()
 
+
 def setup_logging():
     log = logging.getLogger('root')
     log.setLevel(logging.DEBUG)
@@ -50,21 +51,23 @@ MSG: %(message)s
     log_handler.setFormatter(formatter)
     log.addHandler(log_handler)
     log.info('Logger initialized')
+    return log
 
 
 def main(bot_mode, coc):
-    setup_logging()
+    log = setup_logging()
     loop = asyncio.get_event_loop()
 
     try:
         pool = loop.run_until_complete(asyncpg.create_pool(keys.postgres, command_timeout=60))
         bot = FroschBot(bot_config=keys.bot_config(bot_mode), keys=keys,
-                        bot_mode=bot_mode, coc=coc)
-        bot.pool = pool
+                        bot_mode=bot_mode, coc=coc, pool=pool)
         bot.run()
 
-    except Exception:
-        traceback.print_exc()
+    except Exception as error:
+        exc = ''.join(traceback.format_exception(type(error), error, error.__traceback__, chain=True))
+        print(exc)
+        log.error(exc)
 
 
 if __name__ == '__main__':
