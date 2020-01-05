@@ -4,7 +4,7 @@ import logging
 import traceback
 from discord import Forbidden, NotFound, HTTPException
 
-from utils import discord_utils as utils
+from .utils import discord_utils as utils
 
 
 class Administrator(commands.Cog):
@@ -104,6 +104,18 @@ class Administrator(commands.Cog):
         for i in self.bot.cog_tupe:
             output += f"`{i.split('.')[-1]}`\n"
         await self.bot.embed_print(ctx, title='COG LIST', description=output)
+
+    @commands.check(utils.is_owner)
+    @commands.command()
+    async def set_debug(self, ctx, status):
+        if status.lower() in ('f', 'false'):
+            self.bot.debug = False
+            await self.bot.embed_print(ctx, color='green', description='Debugging disabled')
+        elif status.lower() in ('t', 'true'):
+            self.bot.debug = True
+            await self.bot.embed_print(ctx, color='green', description='Debugging enabled')
+        else:
+            await self.bot.embed_print(ctx, color='red', description='Invalid bool')
 
 
 def setup(bot):

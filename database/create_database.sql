@@ -1,22 +1,22 @@
 /*
- - discord_user uniquely identifies a user
- - clash_account links multiple clash_accounts to a discord_user but only one is primary
- - clash_update is historical game data
- - user_not is used by administrators to annotate any changes to an account
-
- This file should only be used once and it is placed in the Docker-compose
+ File should only be used once and it is placed in the Docker-compose
  of the database in order to stand it up.
-
- # For dev
-    DROP TABLE discord_user;
-    DROP TABLE clash_account;
-    DROP TABLE clash_update;
  */
+DROP TABLE discord_user CASCADE ;
+DROP TABLE clash_account CASCADE;
+DROP TABLE clash_update CASCADE;
+DROP TABLE user_note CASCADE;
 
 CREATE TABLE IF NOT EXISTS discord_user (
     discord_id INTEGER PRIMARY KEY,
-    joined_global_discord TIMESTAMP NOT NULL,
-    joined_zulu_database TIMESTAMP NOT NULL,
+    discord_name TEXT NOT NULL,
+    discord_nickname TEXT NOT NULL,
+    discord_discriminator TEXT NOT NULL,
+
+    guild_join_date TIMESTAMP NOT NULL,
+    global_join_date TIMESTAMP NOT NULL,
+    db_join_date TIMESTAMP NOT NULL,
+
     in_zulu_base_planning BOOLEAN DEFAULT false,
     in_zulu_server BOOLEAN DEFAULT false,
     is_active BOOLEAN NOT NULL

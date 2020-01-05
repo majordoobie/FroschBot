@@ -1,4 +1,6 @@
+from coc import utils as coc_utils
 from datetime import datetime
+from discord import member
 from discord.ext import commands, tasks
 import logging
 from .utils.discord_arg_parser import arg_parser
@@ -18,7 +20,7 @@ class PlayerUpdate(commands.Cog):
     async def _bot_status(self, ctx):
         await ctx.send('Database status: ')
 
-    @commands.check(utils.is_admin)
+    #@commands.check(utils.is_admin)
     @commands.command(aliases=['add'])
     async def add_user(self, ctx, *, args=None):
         flag_template = {
@@ -37,24 +39,55 @@ class PlayerUpdate(commands.Cog):
         parsed_args = await arg_parser(flag_template, args)
 
         # Attempt to find user
-        result = await self.bot.utils.get_discord_member(ctx, parsed_args['guild_member'])
-        if result is None:
+        disc_member, in_guild = await self.bot.utils.get_discord_member(ctx, parsed_args['guild_member'])
+        if disc_member is None:
             await self.bot.embed_print(ctx, title='COMMAND ERROR', color='red',
-                                 description=f"User `{parsed_args['guild_member']}` not found")
-        else:
-            await ctx.send(result)
-        #print(result)
+                                       description=f"User `{parsed_args['guild_member']}` not found")
+            return
+        elif in_guild == False:
+            await self.bot.embed_print(ctx, title='COMMAND ERROR', color='red',
+                                       description=f"User `{disc_member.display_name}` is not in this guild")
+            return
+
+        # validate clash tag
+        clash_tag = coc_utils.correct_tag(parsed_args['clash_tag'])
+        try:
+            player = await self.bot.coc.get_player(clash_tag)
+        except:
+            await self.bot.embed_print(ctx, title='CLASH ERROR', color='red',
+                                       description=f'Player `{clash_tag}` not found')
+            return
+
+        # Change users nickname
+        await self.bot.utils.update_user(disc_member, {'nick': player.name,
+                                                       'roles': await self.bot.utils.new_user_roles(ctx, player)})
 
         return
-        # Get guild and global user object
-        guild_member = ctx.author
-        # global_member = await self.bot.fetch_user(guild_member.id)
+
+
+        # Prepare to commit to database
+        # Get names
+        global_username = disc_member.name
+        guild_nick = disc_member.nick       # Returns none if there is no nick
+        global_discriminator = f"{disc_member.name}#{disc_member.discriminator}"
+
 
         # Get times
-        guild_join_date = guild_member.joined_at
-        global_join_date = guild_member.created_at
-        db_join_date = datetime.utcnow()
+        guild_join_date = disc_member.joined_at
+        global_join_date = disc_member.created_at
+        database_join_date = datetime.utcnow()
 
+        # Get zbp status
+        zbp_server = self.bot.get_guild(self.bot.keys.zbp_server)
+        if disc_member in zbp_server.members:
+            in_zbp = True
+        else:
+            in_zbp = False
+
+
+        print(player)
+        print(clash_tag)
+        return
         # Get Names
         global_name = guild_member.name # TODO: Maybe use nick?
         guild_name = guild_member.display_name
