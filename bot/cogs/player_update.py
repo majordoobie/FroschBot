@@ -1,3 +1,4 @@
+from asyncpg import exceptions
 from coc import utils as coc_utils
 from datetime import datetime
 from discord import member
@@ -74,11 +75,30 @@ class PlayerUpdate(commands.Cog):
         in_zulu_server = True
         is_active = True
 
+        # Validate the user does not exist in the database
+        async with self.bot.pool.acquire() as con:
+            # Attempt to get user from db
+            db_obj = await con.fetchrow('''
+            SELECT * FROM discord_user WHERE discord_id=$1''', disc_member.id)
+
+            # If user exists then we need to check if they are inactive or not
+            if db_obj:
+                if db_obj['is_active']:
+                    # TODO: Check to see if there is an alt account to add
+                    await ctx.send("User exists: Check to add new tag doe")
+                else:
+                    # TODO: Check to see if there is an alt account to add
+                    await con.execute('''
+                        UPDATE discord_user SET is_active = $1 WHERE discord_id = $2''',
+                                      True, disc_member.id)
+        print(db_obj)
+        return
+
         # commit to discord_user
         user_data = [(
             disc_member.id,
             disc_member.name,
-            disc_member.nick,
+            disc_member.display_name,
             f"{disc_member.name}#{disc_member.discriminator}",
             disc_member.joined_at,
             disc_member.created_at,
